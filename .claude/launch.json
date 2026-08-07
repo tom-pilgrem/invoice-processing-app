@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": [
+        "-c",
+        "export PATH=/Users/tompilgrem/.nvm/versions/node/v24.19.0/bin:$PATH && cd /Users/tompilgrem/Code/invoice-processing-app && exec ./node_modules/.bin/next dev"
+      ],
+      "port": 3000
+    }
+  ]
+}
