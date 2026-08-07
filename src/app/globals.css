@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-archivo), Archivo, ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: #f3f2f2;
+  --color-surface: #eae9e9;
+  --color-foreground: #201e1d;
+  --color-divider: color-mix(in srgb, #201e1d 40%, transparent);
+
+  --color-accent-100: #fde4de;
+  --color-accent-200: #fbc7ba;
+  --color-accent-300: #f6a68e;
+  --color-accent-400: #f16a49;
+  --color-accent-500: #ec3013;
+  --color-accent-600: #cf2a10;
+  --color-accent-700: #a8220d;
+  --color-accent-800: #7e1a0a;
+  --color-accent-900: #551206;
+  --color-accent: var(--color-accent-500);
+
+  --color-neutral-100: #f8f4f4;
+  --color-neutral-200: #eae9e9;
+  --color-neutral-300: #d8d6d5;
+  --color-neutral-400: #b6b3b1;
+  --color-neutral-500: #8f8b89;
+  --color-neutral-600: #6b6764;
+  --color-neutral-700: #4c4947;
+  --color-neutral-800: #322f2e;
+  --color-neutral-900: #201e1d;
+
+  --shadow-sm: 0 1px 2px rgba(45, 43, 43, .14);
+  --shadow-md: 0 3px 10px rgba(45, 43, 43, .16);
+  --shadow-lg: 0 12px 32px rgba(45, 43, 43, .22);
+
+  --radius-none: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-full: 0px;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
