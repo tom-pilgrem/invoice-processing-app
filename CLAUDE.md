@@ -187,3 +187,26 @@ fill `.env.local` directly once it's scaffolded.
 ## Notes / edge cases carried forward
 - Relative dates ("net 30 from receipt") → treat as "no date found," goes to review.
 - Flag (don't silently guess) if Claude over-infers other fields with low confidence.
+
+# Git & Version Control Guidelines
+
+## Branching & Workflow
+- Use the feature branch workflow; never write code or commit directly to `main`.
+- Feature branch naming convention: `feature/short-description` or `fix/issue-number`.
+- Always pull the latest changes from `main` and rebase your branch before finalizing code.
+
+## Commits & Pull Requests
+- Follow Conventional Commits format (e.g., `feat: add auth service` or `fix: resolve crash`).
+- Write atomic commits; do not bundle unrelated structural changes into a single commit.
+- Provide a summary of structural changes in the commit description when requested.
+- Target PRs to `main` and do not auto-merge; wait for human review.
+
+## Verification & Guardrails
+- Build Command: `npm run build` (or your specific stack build command)
+- Test Command: `npm test`
+- Always run the test suite and verify linting (`npm run lint`) before committing.
+- Do not use git push flags that bypass hooks (e.g., never use `--no-verify`).
+
+## Code Style & Architecture
+- Follow standard project conventions (e.g., "Use ES modules syntax, not CommonJS").
+- Code patterns: Reference file patterns like `@src/components/` for new layout additions.
