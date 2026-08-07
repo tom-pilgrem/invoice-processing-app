@@ -175,14 +175,17 @@ Kept in `.env.local` (gitignored). Do not paste actual key values into chat/comm
 fill `.env.local` directly once it's scaffolded.
 
 ## Build order
-1. Scaffold Next.js + TypeScript + Tailwind, base layout/nav, Archivo font, design tokens.
-2. Supabase project schema + RLS policies; wire up auth (sign up/in) with `@supabase/ssr`.
-3. Upload UI + API route calling Claude with the invoice extraction tool schema;
+
+All 7 stages are complete and live in production.
+
+1. ✅ Scaffold Next.js + TypeScript + Tailwind, base layout/nav, Archivo font, design tokens.
+2. ✅ Supabase project schema + RLS policies; wire up auth (sign up/in) with `@supabase/ssr`.
+3. ✅ Upload UI + API route calling Claude with the invoice extraction tool schema;
    insert straight-through invoices.
-4. Missing-date review screen + batch confirm/save.
-5. Browse/search/filter screen against Supabase (server-side filtering).
-6. Export (SheetJS, two-sheet workbook) wired to current filter state.
-7. Deploy to Vercel, add env vars.
+4. ✅ Missing-date review screen + batch confirm/save.
+5. ✅ Browse/search/filter screen against Supabase (server-side filtering).
+6. ✅ Export (SheetJS, two-sheet workbook) wired to current filter state.
+7. ✅ Deploy to Vercel, add env vars.
 
 ## Notes / edge cases carried forward
 - Relative dates ("net 30 from receipt") → treat as "no date found," goes to review.
