@@ -133,7 +133,10 @@ export function UploadClient() {
       .map((item) => item.invoiceId as string);
 
     if (reviewIds.length > 0) {
-      router.push(`/review?ids=${reviewIds.join(",")}`);
+      const doneCount = queue.filter((item) => item.status === "done").length;
+      router.push(
+        `/review?ids=${reviewIds.join(",")}&total=${queue.length}&done=${doneCount}`,
+      );
     } else {
       router.push("/browse");
     }
