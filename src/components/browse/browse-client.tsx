@@ -11,7 +11,6 @@ import { Table, Thead, Th, Td } from "@/components/ui/table";
 import { ExportModal } from "@/components/browse/export-modal";
 import { LineItemsPanel, type LineItemCacheEntry } from "@/components/browse/line-items-panel";
 import {
-  applyBrowseFilters,
   browseFiltersToQueryString,
   DEFAULT_BROWSE_FILTERS,
   ROW_LIMIT,
@@ -51,8 +50,7 @@ export function BrowseClient({
   hasAnyInvoices: boolean;
 }) {
   const router = useRouter();
-  const [, startTransition] = useTransition();
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const [local, setLocal] = useState<BrowseFilters>(filters);
   const lastWrittenRef = useRef(browseFiltersToQueryString(filters));
@@ -67,7 +65,6 @@ export function BrowseClient({
     (next: BrowseFilters) => {
       const qs = browseFiltersToQueryString(next);
       lastWrittenRef.current = qs;
-      setIsPending(true);
       startTransition(() => {
         router.replace(`/browse${qs}`, { scroll: false });
       });
@@ -77,17 +74,24 @@ export function BrowseClient({
 
   // Resync local state when the incoming filters differ from what we last
   // wrote ourselves — covers back/forward navigation and external links
-  // (e.g. Clear Filters landing via a fresh page load).
+  // (e.g. Clear Filters landing via a fresh page load). This deliberately
+  // stays a useEffect rather than the "adjust state during render" pattern:
+  // that alternative reads/writes `lastWritten` synchronously against
+  // `local`, which raced against the debounce timer below (an in-flight
+  // navigation's arriving props could get compared against a `local` that
+  // had since moved on from further typing, wiping the newer input) —
+  // confirmed live, not theoretical. The effect's async ordering avoids
+  // that race.
   useEffect(() => {
     const incoming = browseFiltersToQueryString(filters);
     if (incoming !== lastWrittenRef.current) {
       setLocal(filters);
       lastWrittenRef.current = incoming;
     }
-    setIsPending(false);
   }, [filters]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- new filtered results should always collapse any expanded row
     setExpandedId(null);
   }, [rows]);
 
@@ -212,7 +216,13 @@ export function BrowseClient({
           />
         </div>
 
-        <Button type="button" variant="ghost" block onClick={handleClearFilters}>
+        <Button
+          type="button"
+          variant="ghost"
+          block
+          disabled={!hasFiltersActive}
+          onClick={handleClearFilters}
+        >
           Clear Filters
         </Button>
       </aside>
