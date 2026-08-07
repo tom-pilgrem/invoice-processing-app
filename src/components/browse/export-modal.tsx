@@ -1,23 +1,24 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { plural } from "@/lib/format";
 
 export function ExportModal({
   open,
   onClose,
-  invoiceCount,
-  lineItemCount,
+  selectedIds,
   activeFilterLabel,
 }: {
   open: boolean;
   onClose: () => void;
-  invoiceCount: number;
-  lineItemCount: number;
+  selectedIds: string[];
   activeFilterLabel: string;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -31,9 +32,38 @@ export function ExportModal({
 
   if (!open) return null;
 
-  function handleDownload() {
-    // TODO(task 6): generate and download the .xlsx export for the current filters.
-    onClose();
+  async function handleDownload() {
+    setDownloading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/invoices/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selectedIds }),
+      });
+
+      if (!res.ok) {
+        setError("Couldn't export — try again.");
+        setDownloading(false);
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const today = new Date().toISOString().slice(0, 10);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `invoices-export-${today}.xlsx`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      setDownloading(false);
+      onClose();
+    } catch {
+      setError("Couldn't export — try again.");
+      setDownloading(false);
+    }
   }
 
   return (
@@ -56,15 +86,22 @@ export function ExportModal({
           Export To Excel
         </h3>
         <p className="mt-3 text-sm text-foreground/80">
-          Exporting {plural(invoiceCount, "Invoice")}, {plural(lineItemCount, "Line Item")},{" "}
+          Exporting {plural(selectedIds.length, "Invoice")} and their line items, within{" "}
           {activeFilterLabel}.
         </p>
+        {error && <p className="mt-3 text-sm text-accent-700">{error}</p>}
         <div className="mt-6 flex justify-end gap-3">
-          <Button type="button" variant="ghost" onClick={onClose}>
+          <Button type="button" variant="ghost" onClick={onClose} disabled={downloading}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleDownload}>
-            Download .Xlsx
+          <Button type="button" onClick={handleDownload} disabled={downloading}>
+            {downloading ? (
+              <span className="flex items-center gap-2">
+                <Spinner className="border-background/40 border-t-background" /> Downloading…
+              </span>
+            ) : (
+              "Download .Xlsx"
+            )}
           </Button>
         </div>
       </div>

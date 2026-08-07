@@ -39,14 +39,12 @@ export function BrowseClient({
   filters,
   totals,
   invoiceCount,
-  lineItemCount,
   hasAnyInvoices,
 }: {
   rows: InvoiceRow[];
   filters: BrowseFilters;
   totals: CurrencyTotal[];
   invoiceCount: number;
-  lineItemCount: number;
   hasAnyInvoices: boolean;
 }) {
   const router = useRouter();
@@ -60,6 +58,7 @@ export function BrowseClient({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [lineItemCache, setLineItemCache] = useState<Record<string, LineItemCacheEntry>>({});
   const [exportOpen, setExportOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const pushFilters = useCallback(
     (next: BrowseFilters) => {
@@ -91,8 +90,9 @@ export function BrowseClient({
   }, [filters]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- new filtered results should always collapse any expanded row
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- new filtered results should always collapse any expanded row and clear selection
     setExpandedId(null);
+    setSelectedIds(new Set());
   }, [rows]);
 
   // Debounced text filters — Enter flushes immediately via onKeyDown below.
@@ -141,6 +141,21 @@ export function BrowseClient({
 
   function toggleExpand(id: string) {
     setExpandedId((prev) => (prev === id ? null : id));
+  }
+
+  function toggleRow(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const allSelected = rows.length > 0 && selectedIds.size === rows.length;
+
+  function toggleAll() {
+    setSelectedIds(allSelected ? new Set() : new Set(rows.map((r) => r.id)));
   }
 
   return (
@@ -238,7 +253,11 @@ export function BrowseClient({
             </Tag>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <Button type="button" onClick={() => setExportOpen(true)}>
+            <Button
+              type="button"
+              disabled={selectedIds.size === 0}
+              onClick={() => setExportOpen(true)}
+            >
               Export To Excel
             </Button>
           </div>
@@ -279,6 +298,14 @@ export function BrowseClient({
               <Table>
                 <Thead>
                   <tr>
+                    <Th className="w-8">
+                      <CheckboxDot
+                        label="Select all"
+                        hideLabel
+                        checked={allSelected}
+                        onChange={toggleAll}
+                      />
+                    </Th>
                     <Th>Vendor</Th>
                     <Th>Invoice #</Th>
                     <Th>Invoice Date</Th>
@@ -306,6 +333,14 @@ export function BrowseClient({
                             }
                           }}
                         >
+                          <Td onClick={(e) => e.stopPropagation()}>
+                            <CheckboxDot
+                              label={`Select invoice ${row.invoice_number ?? row.id}`}
+                              hideLabel
+                              checked={selectedIds.has(row.id)}
+                              onChange={() => toggleRow(row.id)}
+                            />
+                          </Td>
                           <Td>{row.vendor ?? "–"}</Td>
                           <Td>{row.invoice_number ?? "–"}</Td>
                           <Td>{row.invoice_date ? fmtDateShort(row.invoice_date) : "–"}</Td>
@@ -330,7 +365,7 @@ export function BrowseClient({
                         </tr>
                         {isExpanded && (
                           <tr id={`line-items-${row.id}`} className="border-b-2 border-divider">
-                            <td colSpan={6} className="p-0">
+                            <td colSpan={7} className="p-0">
                               <LineItemsPanel
                                 invoiceId={row.id}
                                 abn={row.abn}
@@ -362,8 +397,7 @@ export function BrowseClient({
       <ExportModal
         open={exportOpen}
         onClose={() => setExportOpen(false)}
-        invoiceCount={invoiceCount}
-        lineItemCount={lineItemCount}
+        selectedIds={Array.from(selectedIds)}
         activeFilterLabel={activeFilterLabel}
       />
     </div>
