@@ -7,6 +7,8 @@ to Excel. Desktop-first internal ops tool, deployed and in use.
 Full product/technical spec lives in [CLAUDE.md](CLAUDE.md) — data model, extraction
 prompt rules, design system, and build history.
 
+Project built using Claude Code and Claude Design.
+
 ## Status
 
 All build stages are complete and deployed:
