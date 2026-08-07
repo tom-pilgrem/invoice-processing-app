@@ -39,14 +39,19 @@ export function Input({ className = "", ...props }: InputHTMLAttributes<HTMLInpu
 
 export function CheckboxDot({
   label,
+  hideLabel = false,
   wrapperClassName = "",
   ...props
-}: InputHTMLAttributes<HTMLInputElement> & { label: string; wrapperClassName?: string }) {
+}: InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  hideLabel?: boolean;
+  wrapperClassName?: string;
+}) {
   return (
     <label className={["inline-flex items-center gap-2 text-sm", wrapperClassName].join(" ")}>
       <input type="checkbox" className="peer sr-only" {...props} />
       <span className="inline-block h-3.5 w-3.5 shrink-0 border-2 border-divider peer-checked:border-accent peer-checked:bg-accent" />
-      {label}
+      <span className={hideLabel ? "sr-only" : undefined}>{label}</span>
     </label>
   );
 }

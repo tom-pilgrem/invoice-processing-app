@@ -42,12 +42,6 @@ export default async function BrowsePage({ searchParams }: PageProps<"/browse">)
     0,
   );
 
-  let lineItemCountQuery = supabase
-    .from("invoice_line_items")
-    .select("id, invoices!inner(id)", { count: "exact", head: true });
-  lineItemCountQuery = applyBrowseFilters(lineItemCountQuery, filters, "invoices.");
-  const { count: lineItemCount } = await lineItemCountQuery;
-
   const { count: totalInvoiceCount } = await supabase
     .from("invoices")
     .select("id", { count: "exact", head: true });
@@ -58,7 +52,6 @@ export default async function BrowsePage({ searchParams }: PageProps<"/browse">)
       filters={filters}
       totals={totals}
       invoiceCount={invoiceCount}
-      lineItemCount={lineItemCount ?? 0}
       hasAnyInvoices={(totalInvoiceCount ?? 0) > 0}
     />
   );
