@@ -41,6 +41,7 @@ Format rules:
 - due_date: as YYYY-MM-DD. Null if not present.
 - service_date (per line item): as YYYY-MM-DD. Null if not present.
 - currency: the 3-letter ISO code (AUD, USD, NZD, etc.) inferred from currency symbols/text on the invoice ($, A$, US$, etc). Null if genuinely ambiguous.
+- discount_pct: as a decimal fraction, not a percentage (e.g. a 10% discount is 0.1, not 10).
 - Numbers only for all monetary values, no currency symbols.
 - Null for any missing fields.
 - product_code: reconstruct codes split across lines by OCR. If a prefix (e.g. "CAT") appears on one line and a number (e.g. "001") on the next, combine them as "CAT001". Use surrounding context to identify the prefix.`;
